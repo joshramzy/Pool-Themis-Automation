@@ -12,6 +12,11 @@ class RunRequest(BaseModel):
     task: str
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/run")
 def run_task(request: RunRequest, x_api_key: str = Header(None)):
     expected = os.environ.get("API_SECRET_KEY")
@@ -24,5 +29,4 @@ def run_task(request: RunRequest, x_api_key: str = Header(None)):
         text=True,
     )
     status = "ok" if result.returncode == 0 else "error"
-    output = result.stdout if result.returncode == 0 else result.stderr
-    return {"status": status, "output": output}
+    return {"status": status, "stdout": result.stdout, "stderr": result.stderr}
