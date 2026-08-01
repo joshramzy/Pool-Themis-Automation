@@ -18,4 +18,4 @@ USER goose
 
 ENV CHROME_BIN=/usr/bin/chromium
 
-CMD goose serve --port $PORT
+CMD goose serve --port ${PORT:-3000}
