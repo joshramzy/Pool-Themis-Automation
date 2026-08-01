@@ -1,8 +1,12 @@
 FROM ubuntu:24.04
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl gnupg bzip2 \
+    && apt-get install -y --no-install-recommends ca-certificates curl gnupg bzip2 python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install FastAPI/uvicorn (--break-system-packages needed: Ubuntu 24.04's
+# system Python is PEP 668-managed and refuses plain pip installs)
+RUN pip3 install --no-cache-dir --break-system-packages fastapi uvicorn
 
 # Install Goose CLI via the official install script
 RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh \
@@ -29,8 +33,13 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
 ENV CHROME_BIN=/usr/bin/google-chrome-stable
 ENV GOOSE_DISABLE_KEYRING=1
 
+WORKDIR /app
+COPY api.py start.sh /app/
+RUN chmod +x /app/start.sh
+
 EXPOSE 7681
+EXPOSE 8080
 
 ENTRYPOINT []
 
-CMD ["/bin/sh", "-c", "ttyd -W -p 7681 -c \"${GOOSE_WEB_USER}:${GOOSE_WEB_PASSWORD}\" goose session"]
+CMD ["/app/start.sh"]
