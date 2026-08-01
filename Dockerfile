@@ -1,13 +1,16 @@
 FROM ubuntu:24.04
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
+    && apt-get install -y --no-install-recommends ca-certificates curl gnupg bzip2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Goose CLI from the latest GitHub release
-RUN curl -fsSL https://github.com/aaif-goose/goose/releases/latest/download/goose-x86_64-unknown-linux-musl.tar.gz \
-    | tar xz -C /usr/local/bin \
-    && chmod +x /usr/local/bin/goose
+# Install Goose CLI via the official install script
+RUN curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh \
+    | CONFIGURE=false GOOSE_BIN_DIR=/usr/local/bin bash
+
+# Install ttyd
+RUN curl -fsSL -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 \
+    && chmod +x /usr/local/bin/ttyd
 
 # Install 1Password CLI
 RUN curl -sSfo op.deb "https://downloads.1password.com/linux/debian/amd64/stable/1password-cli-amd64-latest.deb" \
@@ -24,7 +27,10 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
     && rm -rf /var/lib/apt/lists/*
 
 ENV CHROME_BIN=/usr/bin/google-chrome-stable
+ENV GOOSE_DISABLE_KEYRING=1
+
+EXPOSE 3000
 
 ENTRYPOINT []
 
-CMD goose serve --port ${PORT:-3000}
+CMD ["/bin/sh", "-c", "ttyd -p 3000 -W -c \"${GOOSE_WEB_USER}:${GOOSE_WEB_PASSWORD}\" goose session"]
