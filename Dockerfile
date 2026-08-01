@@ -29,8 +29,8 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
 ENV CHROME_BIN=/usr/bin/google-chrome-stable
 ENV GOOSE_DISABLE_KEYRING=1
 
-EXPOSE 3000
+EXPOSE 7681
 
 ENTRYPOINT []
 
-CMD ["/bin/sh", "-c", "ttyd -p 3000 -W -c \"${GOOSE_WEB_USER}:${GOOSE_WEB_PASSWORD}\" goose session"]
+CMD ["ttyd", "-W", "-p", "7681", "goose", "session"]
