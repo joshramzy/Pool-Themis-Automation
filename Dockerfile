@@ -14,8 +14,11 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends chromium \
     && rm -rf /var/lib/apt/lists/*
 
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 USER goose
 
 ENV CHROME_BIN=/usr/bin/chromium
 
-CMD goose serve --port ${PORT:-3000}
+CMD ["/start.sh"]
