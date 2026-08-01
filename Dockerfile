@@ -33,4 +33,4 @@ EXPOSE 7681
 
 ENTRYPOINT []
 
-CMD ["ttyd", "-W", "-p", "7681", "goose", "session"]
+CMD ["/bin/sh", "-c", "ttyd -W -p 7681 -c \"${GOOSE_WEB_USER}:${GOOSE_WEB_PASSWORD}\" goose session"]
