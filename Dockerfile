@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && apt-get install -y --no-install-recommends ca-certificates curl bzip2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Goose CLI from the latest GitHub release
@@ -24,4 +24,4 @@ ENV CHROME_BIN=/usr/bin/chromium-browser
 
 ENTRYPOINT []
 
-CMD goose serve --port ${PORT:-3000}
+CMD ["/bin/sh", "-c", "goose serve --port ${PORT:-3000}"]
